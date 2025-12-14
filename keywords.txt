@@ -15,6 +15,7 @@ DmxSimple	KEYWORD1
 write	KEYWORD2
 maxChannel	KEYWORD2
 usePin	KEYWORD2
+setStartCode	KEYWORD2
   
 #######################################
 # Constants (LITERAL1)

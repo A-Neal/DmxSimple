@@ -1,3 +1,8 @@
+DmxSimple v3.2 patch:
+  Changes from v3.1 to v3.2:
+    Added the ability to set the start code of the DMX frame
+    Lengthened the reset pulse "SPACE" for BREAK to be within DMX512-A spec
+      (ANSI E1.11-2008 (R2018)), minimum 92 microseconds
 DmxSimple v3 release:
   Changes from v2 to v3:
     Optimised interrupt routine now supports serial baud rates up to 115200.

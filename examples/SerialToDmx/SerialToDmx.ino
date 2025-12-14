@@ -5,9 +5,11 @@
 **
 ** <number>c : Select DMX channel
 ** <number>v : Set DMX channel to new value
+** <number>s : Set DMX start code
 **
 ** These can be combined. For example:
 ** 100c355w : Set channel 100 to value 255.
+** 34s23c244w : Set start code to 34, and channel 23 to 244.
 **
 ** For more details, and compatible Processing sketch,
 ** visit http://code.google.com/p/tinkerit/wiki/SerialToDmx
@@ -23,6 +25,7 @@ void setup() {
   Serial.println("Syntax:");
   Serial.println(" 123c : use DMX channel 123");
   Serial.println(" 45w  : set current channel to value 45");
+  Serial.println(" 10s  : set start code to value 10");
 }
 
 int value = 0;
@@ -35,6 +38,8 @@ void loop() {
   c = Serial.read();
   if ((c>='0') && (c<='9')) {
     value = 10*value + c - '0';
+  } else if (c =='s') {
+    DmxSimple.setStartCode(value);
   } else {
     if (c=='c') channel = value;
     else if (c=='w') {

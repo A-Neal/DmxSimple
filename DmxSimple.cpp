@@ -19,13 +19,9 @@ static uint16_t dmxMax = 16; /* Default to sending the first 16 channels */
 static uint8_t dmxStarted = 0;
 static uint16_t dmxState = 0;
 
-#if defined(ARDUINO_TEENSY40) || defined(ARDUINO_TEENSY41) || defined(ARDUINO_TEENSY_MICROMOD) 
-// Teensy 4.X has 32-bit ports
-static volatile uint32_t *dmxPort;
-#else
-static volatile uint8_t *dmxPort;
-#endif
+static uint8_t startCode = 0; // First byte sent in the frame
 
+static volatile uint8_t *dmxPort;
 static uint8_t dmxBit = 0;
 static uint8_t dmxPin = 3; // Defaults to output on pin 3 to support Tinker.it! DMX shield
 
@@ -34,6 +30,7 @@ void dmxEnd();
 void dmxSendByte(volatile uint8_t);
 void dmxWrite(int,uint8_t);
 void dmxMaxChannel(int);
+void dmxSetControl(uint8_t);
 
 /* TIMER2 has a different register mapping on the ATmega8.
  * The modern chips (168, 328P, 1280) use identical mappings.
@@ -216,14 +213,19 @@ ISR(ISR_NAME,ISR_NOBLOCK) {
     if (dmxState == 0) {
       // Next thing to send is reset pulse and start code
       // which takes 35 bit periods
+      // (actually 39, but I didn't alter the logic because it was easier to
+      // alter only the delay time in the loop below)
       uint8_t i;
       if (bitsLeft < 35) break;
       bitsLeft-=35;
       *dmxPort &= ~dmxBit;
-      for (i=0; i<11; i++) delayMicroseconds(8);
+      for (i=0; i<11; i++) delayMicroseconds(10); // I changed 8 to 10 here
+						  // because the space for
+						  // break was shorter than
+						  // the DMX512-A spec minimum
       *dmxPort |= dmxBit;
       delayMicroseconds(12);
-      dmxSendByte(0);
+      dmxSendByte(startCode);
     } else {
       // Now send a channel which takes 11 bit periods
       if (bitsLeft < 11) break;
@@ -263,6 +265,9 @@ void dmxMaxChannel(int channel) {
   }
 }
 
+void dmxSetStartCode(uint8_t cB) {
+	startCode = cB;
+}
 
 /* C++ wrapper */
 
@@ -291,5 +296,10 @@ void DmxSimpleClass::maxChannel(int channel) {
 void DmxSimpleClass::write(int address, uint8_t value)
 {
 	dmxWrite(address, value);
+}
+
+/** Set DMX start code */
+void DmxSimpleClass::setStartCode(uint8_t value) {
+	dmxSetStartCode(value);
 }
 DmxSimpleClass DmxSimple;

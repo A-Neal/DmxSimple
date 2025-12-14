@@ -37,6 +37,12 @@ Set the number of DMX channels in the DMX system. The DMX system sends out chann
 
 Set the output pin. DmxSimple defaults to using pin 3, making it compatible with the Tinker.it! DMX shield. But if you use this function, you can output on any pin capable of digital output. 
 
+### DmxSimple.setStartCode(value);
+
+#### (EXPERIMENTAL)
+
+Set the first byte in the DMX data frame. The first byte is the start code, signalling the type of data contained in the frame. A start code of 0x00 corresponds to standard DMX dimmer values. Other start codes may indicate configuration data for a fixture or manufacturer-specific signals. This defaults to 0 and is rarely set to anything different. This is included more for completeness than full functionality. You would typically send an entirely different frame when using a non-zero start code, but the current implementation does not allow for altering the entire frame while output is disabled.
+
 ## DmxSimple community
 
 We now have a group on Google Groups. Get assistance starting with DMX, or show off your installations. 
